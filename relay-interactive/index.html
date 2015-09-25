@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+	<title>LED test</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body { font: 13px Helvetica, Arial; }
+		form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+		form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+		form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+		#messages { list-style-type: none; margin: 0; padding: 0; }
+		#messages li { padding: 5px 10px; }
+		#messages li:nth-child(odd) { background: #eee; }
+
+		body{
+			text-align: center;
+		}
+		.colorbox{
+			height: 300px;
+			width: 100%;
+			margin-bottom: 30px;
+			background-color: black;
+		}
+		.colorbox.active{
+			background-color: blue;
+		}
+		.LEDbutton{
+			height: 60px;
+			width: 80%;
+		}
+	</style>
+  </head>
+	<body>
+		<div class="colorbox"></div>
+		<button class="LEDbutton">LED</button>
+
+		<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+		<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+		<script>
+			var socket = io();
+
+			// send
+			$('.LEDbutton').on('touchstart mousedown', function(){
+				socket.emit('LEDevent_on');
+				$('.colorbox').addClass('active');
+			});
+			$('.LEDbutton').on('touchend mouseup', function(){
+				socket.emit('LEDevent_off');
+				$('.colorbox').removeClass('active');
+			});
+
+			// receive
+			// socket.on('LEDevent_on', function(msg){
+			// 	$('.colorbox').addClass('active');
+			// });
+			// socket.on('LEDevent_off', function(msg){
+			// 	$('.colorbox').removeClass('active');
+			// });
+		</script>
+	</body>
+</html>
