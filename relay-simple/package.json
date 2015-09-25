@@ -1,0 +1,10 @@
+{
+  "name": "relay-simple",
+  "version": "1.0.0",
+  "description": "Activate relay switch via GPIO on a Raspberry Pi",
+  "author": "tmhrtwg",
+  "dependencies": {
+    "onoff": "^0.3.2",
+    "sleep": "^1.1.8"
+  }
+}
