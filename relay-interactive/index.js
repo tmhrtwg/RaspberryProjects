@@ -7,30 +7,32 @@ var Gpio = require('onoff').Gpio,
     led = new Gpio(17, 'out');
 
 app.get('/', function(req, res){
-	res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', function(socket){
     // check if LED is on or off, log it's state
-	if(led.readSync() === 0){
-		console.log('led is on');
-	} else if (led.readSync() === 1){
-		console.log('led is off');
-	}
+    if(led.readSync() === 0){
+        console.log('connected: led is on');
 
-	// When there's a push on a button
-	socket.on('LEDevent_on', function(){
-		console.log('LED on!');
-		led.writeSync(0);
-		// socket.emit('LEDevent_on', 'blabla');
-	});
-	socket.on('LEDevent_off', function(){
-		console.log('LED off!');
-		led.writeSync(1);
-		// socket.emit('LEDevent_off', 'blabla');
-	});
+        // send the state to the webpage since it doesn't know yet
+        socket.emit('servLEDevent_on');
+    } else if (led.readSync() === 1){
+        console.log('connected: led is off');
+        socket.emit('LEDevent_off');
+    }
+
+    // When there's a push on a button
+    socket.on('LEDevent_on', function(){
+        led.writeSync(0);
+        io.emit('servLEDevent_on');
+    });
+    socket.on('LEDevent_off', function(){
+        led.writeSync(1);
+        io.emit('servLEDevent_off');
+    });
 });
 
 http.listen(3000, function(){
-	console.log('throwing you a webpage on *:3000!');
+    console.log('throwing you a webpage on *:3000!');
 });
