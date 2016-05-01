@@ -1,60 +1,81 @@
 <!doctype html>
 <html>
   <head>
-    <title>LED test</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font: 13px Helvetica, Arial; }
-        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-        form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-        form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-        #messages { list-style-type: none; margin: 0; padding: 0; }
-        #messages li { padding: 5px 10px; }
-        #messages li:nth-child(odd) { background: #eee; }
+	<title>Interactive relay</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		*{margin: 0; padding: 0; box-sizing: border-box;}
+		html{
+			height: 100%;
+		}
+		body{
+			color: #fff;
+			font-family: sans-serif;
+			text-align: center;
+		}
+		.wrap{
+			margin: 10px auto;
+			padding: 20px;
+			width: 80%;
+		}
+		.title{
+			display: block;
+			font-size: 45px;
+			font-weight: 900;
+			margin-bottom: 15px;
+		}
 
-        body{
-            text-align: center;
-        }
-        .colorbox{
-            height: 300px;
-            width: 100%;
-            margin-bottom: 30px;
-            background-color: black;
-        }
-        .colorbox.active{
-            background-color: blue;
-        }
-        .LEDbutton{
-            height: 60px;
-            width: 80%;
-        }
-    </style>
+		.button{
+			align-items: center;
+			background-color: grey;
+			display: inline-flex;
+			font-size: 30px;
+			height: 100px;
+			justify-content: center;
+			width: 300px;
+		}
+		.button:after{
+			content: "OFF";
+		}
+		.button.active{
+			background-color: blue;
+		}
+		.button.active:after{
+			content: "ON";
+		}
+	</style>
   </head>
-    <body>
-        <div class="colorbox"></div>
-        <button class="LEDbutton">LED</button>
+	<body>
+		<div class="wrap">
+			<div class="button">
+				LED STATUS:
+			</div>
+		</div>
+		<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+		<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+		<script>
+			var socket = io();
 
-        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-        <script>
-            var socket = io();
+			// send commands to server
+			$('.button').on('click', function(){
+				if($(this).hasClass('active')){
+					console.log('active!');
+					socket.emit('LEDevent_deactivate');
+				} else {
+					console.log('not active, tell server to activate');
+					socket.emit('LEDevent_activate');
+				}
+			});
 
-            // send
-            $('.LEDbutton').on('touchstart mousedown', function(){
-                socket.emit('LEDevent_on');
-            });
-            $('.LEDbutton').on('touchend mouseup', function(){
-                socket.emit('LEDevent_off');
-            });
-
-            // receive
-            socket.on('servLEDevent_on', function(msg){
-                $('.colorbox').addClass('active');
-            });
-            socket.on('servLEDevent_off', function(msg){
-                $('.colorbox').removeClass('active');
-            });
-        </script>
-    </body>
+			// receive from server
+			socket.on('servLEDevent_on', function(msg){
+				console.log('page: received confirmation from server led is activated. Show it on page.');
+				$('.button').addClass('active');
+			});
+			socket.on('servLEDevent_off', function(msg){
+				console.log('page: received confirmation from server led is deactivated. Show it on page.');
+				$('.button').removeClass('active');
+			});
+		</script>
+	</body>
 </html>

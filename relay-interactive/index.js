@@ -13,22 +13,23 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
     // check if LED is on or off, log it's state
     if(led.readSync() === 0){
-        console.log('connected: led is on');
-
-        // send the state to the webpage since it doesn't know yet
-        socket.emit('servLEDevent_on');
+        console.info('server: led is on. make sure page is updated');
+        io.emit('servLEDevent_on');
     } else if (led.readSync() === 1){
-        console.log('connected: led is off');
-        socket.emit('LEDevent_off');
+    	// this is not needed, because states are updated across all screens
+    	console.info('server: led is on. make sure page is updated');
+        io.emit('servLEDevent_off');
     }
 
     // When there's a push on a button
-    socket.on('LEDevent_on', function(){
-        led.writeSync(0);
+    socket.on('LEDevent_activate', function(){
+    	console.info('server: received command to turn on led. Doing that!');
+        led.writeSync(0); // on
         io.emit('servLEDevent_on');
     });
-    socket.on('LEDevent_off', function(){
-        led.writeSync(1);
+    socket.on('LEDevent_deactivate', function(){
+    	console.info('server: received command to turn off led. Doing that!');
+        led.writeSync(1); // off
         io.emit('servLEDevent_off');
     });
 });
